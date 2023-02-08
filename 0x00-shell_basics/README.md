@@ -5,3 +5,4 @@ Show files in long format
 Show hidden files in long format
 Show in long format numerically and with hidden files
 Script that creates a dir in the tmp dir
+Move file from tmp tp tmp
