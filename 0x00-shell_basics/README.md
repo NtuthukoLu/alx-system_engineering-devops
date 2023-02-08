@@ -7,3 +7,4 @@ Show in long format numerically and with hidden files
 Script that creates a dir in the tmp dir
 Move file from tmp tp tmp
 Script for deleting the file betty
+Script for deleting a dir
