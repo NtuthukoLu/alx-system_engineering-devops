@@ -3,3 +3,4 @@ Script for displaying a list of current dir
 script that changes dir to home dir
 Show files in long format
 Show hidden files in long format
+Show in long format numerically and with hidden files
