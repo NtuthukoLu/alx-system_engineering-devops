@@ -12,3 +12,4 @@ A script that changes working dir to pervious dir
 A script that ls all files in current/parent and boot
 Script that prints type of file named iamafile
 Script for symbolic link
+script for html copies
