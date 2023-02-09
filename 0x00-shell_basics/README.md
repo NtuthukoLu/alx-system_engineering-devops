@@ -13,3 +13,4 @@ A script that ls all files in current/parent and boot
 Script that prints type of file named iamafile
 Script for symbolic link
 script for html copies
+ Move letter with upper case
