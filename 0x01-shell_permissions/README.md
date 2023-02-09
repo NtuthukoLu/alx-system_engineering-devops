@@ -8,3 +8,4 @@ Script that adds execute permission to owner file
 Script that add execution permission to everyone
 Scripts that sets permission to file
 Script that sets mode
+Script that sets mode of hello same as olleh
