@@ -15,3 +15,4 @@ Script for symbolic link
 script for html copies
  Move letter with upper case
 delets all
+Making directories
