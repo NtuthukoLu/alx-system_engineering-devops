@@ -12,3 +12,4 @@ Script that sets mode of hello same as olleh
 Scripts that add execute permissions to all sub and current dir>> README.md
 
 Script that creates dir and grants permission
+Script that changes owners
