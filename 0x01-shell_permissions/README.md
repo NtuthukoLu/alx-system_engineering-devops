@@ -9,3 +9,5 @@ Script that add execution permission to everyone
 Scripts that sets permission to file
 Script that sets mode
 Script that sets mode of hello same as olleh
+Scripts that add execute permissions to all sub and current dir>> README.md
+
