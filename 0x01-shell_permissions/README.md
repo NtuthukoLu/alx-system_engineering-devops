@@ -6,3 +6,4 @@ Script that creates a empty file
 Script that adds execute permission to owner file
  Script that adds execute permission to owner and group
 Script that add execution permission to everyone
+Scripts that sets permission to file
