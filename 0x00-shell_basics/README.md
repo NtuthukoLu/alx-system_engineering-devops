@@ -16,3 +16,6 @@ script for html copies
  Move letter with upper case
 delets all
 Making directories
+Script that lists all files and dir of current dir separatedby commas
+Creating a magic file that can be used with command file to detect>> README.md
+

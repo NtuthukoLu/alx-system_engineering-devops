@@ -13,3 +13,7 @@ Scripts that add execute permissions to all sub and current dir>> README.md
 
 Script that creates dir and grants permission
 Script that changes owners
+Scipt that changes owner and group owner
+Script for symbolic link that changes owner and group owner
+Script that changes owner of file using their name
+Script that will play start wars episode
