@@ -5,3 +5,4 @@
 4. Show last 10 lines of a file
 5. Show the 1st 10 lines of a file
 6. Script that displays 3rd line of a file
+7. Script that creates a file containing characters
