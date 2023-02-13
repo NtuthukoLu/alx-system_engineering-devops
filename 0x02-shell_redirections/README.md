@@ -2,3 +2,4 @@
 1. Script that shows a smiley face
 2. Displays content of /etc/passwd
 3. Show content of both /etc/passwd and /etc/hosts
+4. Show last 10 lines of a file
