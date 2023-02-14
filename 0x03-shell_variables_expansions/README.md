@@ -4,3 +4,4 @@
 3. Script that counts number of dir in the PATH
 4. Script that lists environments varialbles
 5. Script that lists local and environment variables also functions
+6. Script that create a new local variable
