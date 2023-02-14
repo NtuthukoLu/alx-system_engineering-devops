@@ -3,3 +3,4 @@
 2. Script adds /action to path and should be last dir
 3. Script that counts number of dir in the PATH
 4. Script that lists environments varialbles
+5. Script that lists local and environment variables also functions
