@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#Script loops with while loop 10 times.
+a=0
+b=10
+while [ $a -lt $b ]
+do
+	echo "Best School"
+	a=$(( a + 1 ))
+done
