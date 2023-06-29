@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #script shows numbers to 20 and bad luck at certain positions
-for ((i=0;i<20;i++)); 
+i=0
+while [ $i -lt 20 ] 
 do
 	echo $((i + 1))
 	case $i in
@@ -15,5 +16,6 @@ do
 			;;
 		*)
 			;;
-	esac 
+	esac
+	i=$(( i + 1))	
 done                                    
