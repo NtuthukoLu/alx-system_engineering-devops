@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#Script displays best school 10* 9th replace with Hi
+a=0
+while [ $a -lt 10 ]
+do
+	echo "Best School"
+	if [ $a -eq 8 ]
+	then
+		echo "Hi"
+	fi
+	a=$(( a + 1 ))
+done
