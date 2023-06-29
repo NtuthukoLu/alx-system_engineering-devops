@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Script displays number 1 to 100 and Fizz, Buzz, or FizzBuzz
+for ((i=1; i<=100; i++))
+do
+	Divisible=0
+	if [ $((i % 3)) -eq 0 ]
+	then
+		printf "Fizz"
+		Divisible=1
+	fi
+	if [ $((i % 5)) -eq 0 ]
+	then
+		printf "Buzz"
+		Divisible=1
+	fi	
+	if [ $Divisible -eq 0 ]
+	then
+		echo $i
+	else
+		printf "\n"
+	fi
+done
