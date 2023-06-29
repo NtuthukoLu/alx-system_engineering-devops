@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#Script loops using until loop 10 times.
+a=0
+b=10
+until [ $a -eq $b ]
+do
+	echo "Best School"
+	(( a++ ))
+done
