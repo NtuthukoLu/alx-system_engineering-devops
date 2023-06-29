@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 #Script that displase clock
 hour=0
-while [$hour -lt 13 ]
+while [ $hour -lt 13 ]
+do
 	echo "Hour: $hour"
 	min=1
 	while [ $min -lt 60 ]
