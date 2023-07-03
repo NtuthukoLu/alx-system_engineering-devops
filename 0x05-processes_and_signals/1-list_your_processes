@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-# Script shows a list of currently running processes, showing all processes
+# Script shows a list of currently running processes
 ps -e u
