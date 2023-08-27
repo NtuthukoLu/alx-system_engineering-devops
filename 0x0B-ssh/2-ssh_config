@@ -1,0 +1,9 @@
+Host *
+    SendEnv LANG LC_*
+    HashKnownHosts yes
+    GSSAPIAuthentication yes
+    GSSAPIDelegateCredentials no
+
+Host 54.87.157.154
+    IdentityFile ~/.ssh/school
+    Protocol 2
