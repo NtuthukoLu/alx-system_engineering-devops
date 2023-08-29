@@ -1,6 +1,22 @@
 #!/usr/bin/ env bash
-# script to install and setup nginx
-sudo apt-get -y update
-sudo apt-get -y install nginx
-echo "Hello World" > /usr/share/nginx/html/index.html
-service nginx start
+# Install Nginx
+apt-get update
+apt-get install -y nginx
+
+# Create a basic HTML file with the desired content
+echo "Hello World!" > /var/www/html/index.html
+
+# Configure Nginx to listen on port 80 and serve the HTML file
+echo "server {
+    listen 80;
+    server_name localhost;
+
+    location / {
+        root /var/www/html;
+        index index.html;
+    }
+}" > /etc/nginx/sites-available/default
+
+# Restart Nginx
+service nginx restart# script to install and setup nginx
+
