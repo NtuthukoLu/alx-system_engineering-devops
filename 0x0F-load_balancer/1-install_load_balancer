@@ -1,44 +1,14 @@
 #!/usr/bin/env bash
-MY_ID=496
-CONFIG_FILE=/etc/haproxy/haproxy.cfg
-INPUT_LINE="
-frontend haproxynode
-        bind *:80
-        mode http
-        default_backend backendnodes
+# Install HAProxy
+sudo apt-get -y update
+sudo apt-get -y upgrade
+sudo apt-get -y install haproxy
 
-backend backendnodes
-        balance roundrobin
-        option forwardfor # ensure forwarded request includes cleint ip
-        server 496-web-01 35.243.204.105
-        server 496-web-02 35.190.182.239
-"
+echo "ENABLED=1" | sudo tee -a /etc/default/haproxy
 
-# check if hostname is correct
-if [[ $(hostname) =~ ^$MY_ID-lb-[0-9]+ ]]; then
-    echo 'hostname properly configured'
-else
-    >&2 echo 'hostname not configured properly...'
-    >&2 echo 'please set hostname to pattern: 496-lb-<server_id>...'
-    >&2 echo 'Example: sudo hostnamectl set-hostname 496-lb-<insert_server_id_here>'
-fi
+# Add to /etc/haproxy/haproxy.conf
+fe="frontend main\n\tbind *:80\n\tmode http\n\tdefault_backend web_servers\n\n"
+be="backend web_servers\n\tbalance roundrobin\n\toption forwardfor\n\tserver 4928-web-01 34.230.11.150:80 check\n\tserver 4928-web-02 3.85.44.226:80 check\n"
+echo -e "\n\n""$fe""$be" | sudo tee -a /etc/haproxy/haproxy.cfg
 
-# check if HAProxy was previously configured
-if [ "$(grep -o "$INPUT_LINE" $CONFIG_FILE | wc -l)" != 0 ]; then
-	echo 'HAProxy already configured to script specs :)...'
-	# restart HAProxy
-	service haproxy restart
-else
-	# install HAProxy Version 1.8
-	apt-get -y install software-properties-common
-	add-apt-repository -y ppa:vbernat/haproxy-1.8
-	apt-get -y update
-	apt-get -y install haproxy=1.8.\*
-
-	# configure HAProxyd
-
-	printf "%s" "$INPUT_LINE" >> $CONFIG_FILE
-
-	# start HAProxy
-	service haproxy start
-fi
+sudo service haproxy start
