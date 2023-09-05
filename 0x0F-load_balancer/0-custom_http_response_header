@@ -3,22 +3,49 @@
 # nginx using listening port 80 that returns a page that
 # contains the string `Hello World` when querying at its
 # root `/`.
-sudo apt-get update
-sudo apt-get install -y nginx
-sudo ufw allow 'Nginx HTTP'
 
-sudo rm /var/www/html/*.html
-sudo echo "Hello World" | sudo tee /var/www/html/index.html
+CONFIG_FILE="/etc/nginx/sites-available/default"
+HOST_NAME=$(hostname)
+MY_ID=496
 
-sudo sed -i "s|        |\t|" /etc/nginx/sites-available/default
+# check if hostname is correct
+if [[ $(hostname) =~ ^$MY_ID-web-[0-9]+ ]]; then
+    echo 'hostname properly configured'
+else
+    (>&2 echo 'hostname not configured properly...')
+    (>&2 echo 'please set hostname to pattern: 496-web-<server_id>...')
+    (>&2 echo 'Example: sudo hostnamectl set-hostname 496-web-<insert_server_id_here>')
+fi
 
-yt="https://www.youtube.com/watch?v=QH2-TGUlwu4"
-old_loc="^\tlocation / {"
-new_loc="\tlocation /redirect_me {\n\t\treturn 301 \$scheme:$yt;\n\t}\n\n\tlocation / {\n\t\tadd_header X-Served-By '$HOSTNAME';"
-sudo sed -i "s|$old_loc|$new_loc|" /etc/nginx/sites-available/default
+# install nginx
+apt-get -y update
+apt-get -y install nginx
 
-sudo echo "Ceci n'est pas une page" | sudo tee /var/www/html/404.html
-new_loc="\terror_page 404 /404.html;\n\n\tlocation / {"
-sudo sed -i "s|$old_loc|$new_loc|" /etc/nginx/sites-available/default
+# update index.html file
+echo 'Holberton School' > /usr/share/nginx/html/index.html
+echo "Ceci n'est pas une page" > /usr/share/nginx/html/404.html
 
-sudo /etc/init.d/nginx restart
+# update config file to redirect
+printf %s "server {
+    listen 80;
+    listen [::]:80 default_server;
+    root   /usr/share/nginx/html;
+    index  index.html index.htm;
+
+    add_header X-Served-By $HOST_NAME;
+
+    location /redirect_me {
+        return 301 http://google.com/;
+    }
+
+    error_page 404 /404.html;
+    location /404 {
+      root /usr/share/nginx/html;
+      internal;
+    }
+}" > $CONFIG_FILE
+
+# start nginx after reloading config
+service nginx start
+# if nginx was already running restart it
+service nginx restart
