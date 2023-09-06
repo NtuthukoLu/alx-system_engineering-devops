@@ -4,48 +4,74 @@
 # contains the string `Hello World` when querying at its
 # root `/`.
 
-CONFIG_FILE="/etc/nginx/sites-available/default"
-HOST_NAME=$(hostname)
-MY_ID=496
+echo -e "Updating and doing some minor checks...\n"
 
-# check if hostname is correct
-if [[ $(hostname) =~ ^$MY_ID-web-[0-9]+ ]]; then
-    echo 'hostname properly configured'
+# Function to install a package if not already installed
+install() {
+    if ! command -v "$1" &> /dev/null; then
+        echo -e "Installing: $1\n"
+        sudo apt-get update -y -qq && sudo apt-get install -y "$1" -qq
+        echo -e "\n"
+    else
+        echo -e "${1} is already installed.\n"
+    fi
+}
+
+install nginx # Install nginx
+
+echo -e "\nSetting up some minor stuff.\n"
+
+# Allowing nginx on the firewall
+sudo ufw allow 'Nginx HTTP'
+
+# Give the user ownership to website files for easy editing
+website_dir="/var/www"
+if [ -d "$website_dir" ]; then
+    sudo chown -R "$USER":"$USER" "$website_dir"
+    sudo chmod -R 755 "$website_dir"
 else
-    (>&2 echo 'hostname not configured properly...')
-    (>&2 echo 'please set hostname to pattern: 496-web-<server_id>...')
-    (>&2 echo 'Example: sudo hostnamectl set-hostname 496-web-<insert_server_id_here>')
+    sudo mkdir -p "$website_dir"
+    sudo chown -R "$USER":"$USER" "$website_dir"
+    sudo chmod -R 755 "$website_dir"
 fi
 
-# install nginx
-apt-get -y update
-apt-get -y install nginx
+# Create directories if not present
+for dir in "$website_dir"/{html,error}; do
+    [ -d "$dir" ] || mkdir -p "$dir"
+done
 
-# update index.html file
-echo 'Holberton School' > /usr/share/nginx/html/index.html
-echo "Ceci n'est pas une page" > /usr/share/nginx/html/404.html
+# Create a new index file
+echo "Hello World!" > "$website_dir"/html/index.html
 
-# update config file to redirect
-printf %s "server {
-    listen 80;
+# Create a new error page
+echo "Ceci n'est pas une page" > "$website_dir"/html/error_404.html
+
+# Backup default server config file
+sudo cp /etc/nginx/sites-enabled/default nginx-sites-enabled_default.backup
+
+server_config="server {
+    listen 80 default_server;
     listen [::]:80 default_server;
-    root   /usr/share/nginx/html;
-    index  index.html index.htm;
-
-    add_header X-Served-By $HOST_NAME;
-
-    location /redirect_me {
-        return 301 http://google.com/;
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
+    server_name _;
+    add_header X-Served-By \$hostname;
+    location / {
+        try_files \$uri \$uri/ =404;
     }
-
-    error_page 404 /404.html;
-    location /404 {
-      root /usr/share/nginx/html;
-      internal;
+    if (\$request_filename ~ redirect_me){
+        rewrite ^ https://youtube.com permanent;
     }
-}" > $CONFIG_FILE
+    error_page 404 /error_404.html;
+    location = /error_404.html {
+        internal;
+    }
+}"
 
-# start nginx after reloading config
-service nginx start
-# if nginx was already running restart it
-service nginx restart
+echo "$server_config" | sudo dd status=none of=/etc/nginx/sites-enabled/default
+
+if ! pgrep -x nginx > /dev/null; then
+    sudo service nginx start
+else
+    sudo service nginx restart
+fi
