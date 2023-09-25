@@ -5,48 +5,36 @@ import json
 import requests
 import sys
 
-def fetch_user_info(user_id):
-    url = f'https://jsonplaceholder.typicode.com/users/{user_id}'
-    response = requests.get(url)
-    return json.loads(response.text)
-
-def fetch_todo_info(user_id):
-    url = f'https://jsonplaceholder.typicode.com/todos/?userId={user_id}'
-    response = requests.get(url)
-    return json.loads(response.text)
-
-def main():
-    if len(sys.argv) != 2:
-        print("Usage: python script.py <user_id>")
-        sys.exit(1)
-
+if __name__ == "__main__":
     user_id = sys.argv[1]
 
-    try:
-        user_info = fetch_user_info(user_id)
-        todo_info = fetch_todo_info(user_id)
+    # create Response object for specific user and that user's tasks
+    url = 'https://jsonplaceholder.typicode.com/users/{}'.format(user_id)
+    user_response = requests.get(url)
 
-        tasks = []
+    url = 'https://jsonplaceholder.typicode.com/todos/?userId={}'\
+        .format(user_id)
+    todo_response = requests.get(url)
 
-        for task in todo_info:
-            task_dict = {
-                'task': task['title'],
-                'completed': task['completed'],
-                'username': user_info['username']
-            }
-            tasks.append(task_dict)
+    # create Dictionary objects from response objects
+    user_info = json.loads(user_response.text)
+    todo_info = json.loads(todo_response.text)
 
-        with open(f'{user_id}.json', 'w', encoding='UTF8', newline='') as f:
-            json.dump(tasks, f, indent=4)
+    tasks = {}
 
-        print(f'Tasks for user {user_id} saved to {user_id}.json')
-    except requests.exceptions.RequestException as e:
-        print(f"An error occurred: {e}")
-        sys.exit(1)
-    except KeyError:
-        print(f"User with id {user_id} not found")
-        sys.exit(1)
+    tasks_list = []
+    for task in todo_info:
+        # create a dictionary for each task
+        task_dict = {}
+        task_dict['task'] = task['title']
+        task_dict['completed'] = task['completed']
+        task_dict['username'] = user_info['username']
+        # add task dictionary to the list of tasks
+        tasks_list.append(task_dict)
 
-if __name__ == "__main__":
-    main()
+    # add list of tasks to dictionary
+    tasks[user_id] = tasks_list
 
+    with open('./{}.json'.format(user_id), 'w', encoding='UTF8',
+              newline='') as f:
+        f.write(json.dumps(tasks))
