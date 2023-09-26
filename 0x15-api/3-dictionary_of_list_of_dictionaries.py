@@ -11,25 +11,34 @@ if __name__ == "__main__":
     user_response = requests.get(url)
     user_info = json.loads(user_response.text)
 
-    builder = {}
-    for user in users:
-        employee_id = user.get('id')
-        user_id_key = str(employee_id)
-        username = user.get('username')
-        builder[user_id_key] = []
-        url = 'https://jsonplaceholder.typicode.com/todos/?userId={}'\.format(employee_id)
+    # create dictionary containing users and their associated tasks
+    tasks = {}
+    for user in user_info:
+        user_id = user['id']
 
-        response = requests.get(url)
-        objs = json.loads(response.text)
-        for obj in objs:
-                json_data = {
-                    "task": obj.get('title'),
-                    "completed": obj.get('completed'),
-                    "username": username
-                }
-                builder[user_id_key].append(json_data)
+        # create Response object for specific user and that user's tasks
+        url = 'https://jsonplaceholder.typicode.com/todos/?userId={}'\
+            .format(user_id)
+        todo_response = requests.get(url)
 
-    # write the data to the file
-    json_encoded_data = json.dumps(builder)
-    with open('todo_all_employees.json', 'w') as myFile:
-        myFile.write(json_encoded_data)
+        # create Dictionary objects from response objects
+        todo_info = json.loads(todo_response.text)
+
+        tasks_list = []
+        for task in todo_info:
+            # create a dictionary for each task
+            task_dict = {}
+            task_dict['username'] = user['username']
+            task_dict['task'] = task['title']
+            task_dict['completed'] = task['completed']
+            # add task dictionary to the list of tasks
+            tasks_list.append(task_dict)
+
+        # add list of tasks to dictionary for that specific user
+        tasks[user_id] = tasks_list
+
+    # print json string to file; note: could have used dump to print
+    # directly to file.
+    with open('todo_all_employees.json', 'w', encoding='UTF8',
+              newline='') as f:
+        f.write(json.dumps(tasks))
