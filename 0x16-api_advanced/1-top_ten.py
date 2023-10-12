@@ -24,13 +24,8 @@ def top_ten(subreddit):
                 print(post['data']['title'])
 
         else:
-            print('No data found')
+            print('None')
     except requests.exceptions.RequestException as e:
         print(f'Error: {e}')
     except Exception as e:
         print(f'An error occurred: {e}')
-
-if __name__ == '__main__':
-    subreddit = 'python'  # Change this to the subreddit you want to retrieve
-    top_ten(subreddit)
-
