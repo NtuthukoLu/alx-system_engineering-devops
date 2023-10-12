@@ -1,44 +1,90 @@
 #!/usr/bin/python3
+"""script for parsing web data from an api
+    DISCLAIMER: THIS PROBABLY SHOULDN'T BE DONE RECURSIVELY
+    but we had to for school :P
+"""
+import json
 import requests
+import sys
 
-def count_words(subreddit, word_list, after=None, counts=None):
-    if counts is None:
-        counts = {}
 
-    url = f'https://www.reddit.com/r/{subreddit}/hot.json?limit=100'
+def get_hot_posts(subreddit, hot_list=[]):
+    """api call to reddit to get the number of subscribers
+    """
+    base_url = 'https://www.reddit.com/r/{}/top.json'.format(
+        subreddit
+    )
     headers = {
-        'User-Agent': 'MyRedditBot/1.0 (by YourUsername)'
+        'User-Agent':
+        'Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.9.2.3) \
+        Gecko/20100401 Firefox/3.6.3 (FM Scene 4.6.1)'
     }
-    params = {'after': after} if after else None
-
+    if len(hot_list) == 0:
+        # grab initial list
+        url = base_url
+    else:
+        # grab next pagination after last obj in hot_list
+        url = base_url + '?after={}_{}'.format(
+            hot_list[-1].get('kind'),
+            hot_list[-1].get('data').get('id')
+        )
+    response = requests.get(url, headers=headers)
+    resp = json.loads(response.text)
     try:
-        response = requests.get(url, headers=headers, params=params)
-        response.raise_for_status()  # Raise an exception for HTTP errors
+        data = resp.get('data')
+        children = data.get('children')
+    except:
+        return None
+    if children is None or data is None or len(children) < 1:
+        return hot_list
+    hot_list.extend(children)
+    return get_hot_posts(subreddit, hot_list)
 
-        data = response.json()
 
-        if 'data' in data and 'children' in data['data']:
-            posts = data['data']['children']
+def count_words(subreddit, wordlist):
+    """count words in titles of hot posts for subreddit
+    """
+    posts = get_hot_posts(subreddit)
+    if posts is None:
+        print(end="")
+        return
+    words = gather_word_info(posts, wordlist)
+    sorted_list = [(key, val) for key, val in words.items()]
+    sorted_list = sorted(sorted_list, key=lambda tup: tup[1], reverse=True)
+    [print("{}: {}".format(key, val)) for (key, val) in sorted_list if val > 0]
 
-            for post in posts:
-                title = post['data']['title'].lower()
-                for word in word_list:
-                    if word.lower() in title:
-                        if word in counts:
-                            counts[word] += 1
-                        else:
-                            counts[word] = 1
 
-            after = data['data']['after']
+def gather_word_info(hot_posts, wordlist,
+                     posts_len=None,
+                     counter=0,
+                     words_info=None):
+    """does the recursion to grab word info from wordlist and posts
+    """
+    if hot_posts is None:
+        return
+    # generate defaults
+    if posts_len is None:
+        posts_len = len(hot_posts)
+    if words_info is None:
+        words_info = {key: 0 for key in wordlist}
+    # base case
+    if counter == posts_len - 1:
+        return words_info
 
-            if after is not None:
-                return count_words(subreddit, word_list, after, counts)
-
-    except requests.exceptions.RequestException as e:
-        print(f'Error: {e}')
-    except Exception as e:
-        print(f'An error occurred: {e}')
-
-    sorted_counts = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
-    for word, count in sorted_counts:
-        print(f"{word}: {count}")
+    # parse this title and move to next
+    data = hot_posts[counter].get('data')
+    if data is None:
+        return words_info
+    title = data.get('title')
+    if title is None:
+        return words_info
+    # im sorry im not doing recursion for text parsing that's rediculous
+    for word in title.split(' '):
+        word = word.lower()
+        if word in wordlist:
+            words_info[word] += 1
+    counter += 1
+    return gather_word_info(
+        hot_posts, wordlist, posts_len,
+        counter, words_info
+    )
