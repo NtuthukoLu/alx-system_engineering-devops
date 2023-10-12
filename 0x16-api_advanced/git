@@ -1,0 +1,9 @@
+#!/bin/bash
+
+git add .
+
+echo -n 'Enter commit message'
+read sMsg
+
+git commit -m '$sMsg'
+git push
