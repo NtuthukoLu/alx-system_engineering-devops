@@ -1,31 +1,35 @@
 #!/usr/bin/python3
 """script for parsing web data from an api
 """
+import json
 import requests
+import sys
 
 
 def top_ten(subreddit):
-    base_url = f'https://www.reddit.com/r/{subreddit}/top.json?limit=10'
+    """api call to reddit to get the number of subscribers
+    """
+    base_url = 'https://www.reddit.com/r/'
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.9.2.3) '
-                      'Gecko/20100401 Firefox/3.6.3 (FM Scene 4.6.1)'
+        'User-Agent':
+        'Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.9.2.3) \
+        Gecko/20100401 Firefox/3.6.3 (FM Scene 4.6.1)'
     }
+    # grab info about all users
+    url = base_url + '{}/top/.json?count=10'.format(subreddit)
+    response = requests.get(url, headers=headers)
+    resp = json.loads(response.text)
 
     try:
-        response = requests.get(base_url, headers=headers)
-        response.raise_for_status()  # Raise an exception for HTTP errors
+        # grab the info about the users' tasks
+        data = resp.get('data')
+        children = data.get('children')
+    except:
+        print('None')
+    if children is None or data is None or len(children) < 1:
+        print('None')
 
-        data = response.json()
-
-        if 'data' in data and 'children' in data['data']:
-            posts = data['data']['children']
-
-            for i, post in enumerate(posts[:10]):
-                print(post['data']['title'])
-
-        else:
-            print('None')
-    except requests.exceptions.RequestException as e:
-        print(f'Error: {e}')
-    except Exception as e:
-        print(f'An error occurred: {e}')
+    for i, post_dict in enumerate(children):
+        if i == 10:
+            break
+        print(post_dict.get('data').get('title'))
